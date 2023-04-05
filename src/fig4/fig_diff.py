@@ -50,7 +50,7 @@ ax.set_xlabel("$\sum_a N_a$ (# of Attackers)")
 ax.set_ylabel("$\sum_d N_d$ (# of Defenders)")
 
 cbar = fig1.colorbar(cp)
-cbar.ax.set_ylabel('Harm')
+cbar.ax.set_ylabel('Mean Harm')
 
 save_dir = './fig4/figures'
 if not os.path.exists(save_dir):
