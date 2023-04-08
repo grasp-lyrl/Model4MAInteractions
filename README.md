@@ -1,8 +1,6 @@
 # A Model for Multi-Agent Heterogeneous Interaction Problems
 
-
-
-[SpinningUp](https://github.com/openai/spinningup)
+[A Model for Multi-Agent Heterogeneous Interaction Problems](https://arxiv.org/abs/2208.01430)
 
 + Author: Christopher Hsu
 + Email: chsu8@seas.upenn.edu
@@ -22,4 +20,16 @@ conda activate interaction
 ```
 conda env create -f conda_envs/environment_fixed.yml
 conda activate interaction
+```
+
+### Citing 
+```
+@misc{hsu2023model,
+      title={A Model for Multi-Agent Heterogeneous Interaction Problems}, 
+      author={Christopher D. Hsu and Mulugeta A. Haile and Pratik Chaudhari},
+      year={2023},
+      eprint={2208.01430},
+      archivePrefix={arXiv},
+      primaryClass={cs.MA}
+}
 ```
