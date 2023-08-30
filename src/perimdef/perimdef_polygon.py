@@ -176,6 +176,7 @@ def simulate(w,e=100,na=int(100),debug=False):
     N = w['N']
     c = []
     capture = []
+    mat_list = []
     ## define perimeter
     ## we want to also map to arbitrary polygon based on arc length
     pts = np.array([[-1,0],
@@ -194,10 +195,10 @@ def simulate(w,e=100,na=int(100),debug=False):
         qa = np.random.multinomial(na, w['qa'])
         qa = np.repeat(np.arange(N), qa)
         ## get bin indexs for agents
-        # qas = np.tile(qa, (N,1))
-        # oo = np.arange(N)
-        # oo = np.tile(oo, (na,1)).T
-        # ii = (qas==oo)
+        qas = np.tile(qa, (N,1))
+        oo = np.arange(N)
+        oo = np.tile(oo, (na,1)).T
+        ii = (qas==oo)
 
         fat = np.ones(len(qa)); lat = np.ones(len(qa)); mat = np.zeros(len(qa))
 
@@ -209,7 +210,7 @@ def simulate(w,e=100,na=int(100),debug=False):
         d = np.random.multinomial(na, Pd)
         d = np.repeat(np.arange(N), d)
         # random assigment
-        # np.random.shuffle(d)
+        np.random.shuffle(d)
 
         ## initialize intruders and defenders in cartesian
         intruders_init = att_xy[qa]
@@ -292,14 +293,31 @@ def simulate(w,e=100,na=int(100),debug=False):
 
         c.append(Fm(mat).mean())
         capture.append(1-fat.sum()/na)
-        # print(c[-1], w['h'], Fm(mat).mean(), tt)
+        # print(capture[-1], w['h'], Fm(mat).mean(), tt)
 
         if e > 10 and (ee % (e//10) == 0):
             print('[%04d]'%ee)
-    # print(np.mean(c), np.std(c))
+
+
+        ## episode harm distribution from na attackers to N bins
+        xx = np.tile(fat, (N,1))
+        mm = np.sum(xx*ii, axis=1)
+        mm = mm/N
+        mm = mm/mm.sum()
+        mat_list.append(mm)
+    ## average over all episodes harm and smooth with conv
+    mm = np.asarray(mat_list)
+    mm = np.sum(mm,axis=0)
+    mm = mm/mm.sum()
+    # mm = conv(mm)/conv(mm).sum()
+
+    print(np.mean(c), np.std(c))
 
     return dict(Qa=w['qa'],
                 Pd=Pd,
+                harm=mm,
+                perim_xy=perim_xy,
+                att_xy=att_xy,
                 capture=capture,
                 Capture=(np.mean(capture),np.std(capture)),
                 c=c,
@@ -338,7 +356,7 @@ if __name__ == '__main__':
 
 
     if args.save:
-        save_dir = './pd/data'
+        save_dir = './data/shuffle%d_control%d'%(args.shuffle,args.control)
         if not os.path.exists(save_dir):
             os.makedirs(save_dir)
         
