@@ -96,8 +96,6 @@ def make_convolve_2d_pbc(func, x, sigma, B=1.0):
         return ifft(fft(x.reshape((N, N))) * frp_ft).flatten()
     return convolve
 
-conv = make_convolve_2d_pbc(func, x, sigma)
-
 def build_2d_frp_matrix(func, vector, sigma):
     """ Builds quadratic frp matrix respecting pbc.
 
@@ -126,8 +124,6 @@ def build_2d_frp_matrix(func, vector, sigma):
         if nn > 10 and (row % (nn//10) == 0):
             print('[%04d]'%row)
     return A
-
-fda = build_2d_frp_matrix(func, x, sigma)
 
 def calc_pd(qa):
     N = len(qa)
@@ -260,15 +256,22 @@ if __name__ == "__main__":
 
     parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument('--save', type=int, default=1)
+    parser.add_argument('--sigma_P', type=float, default=0.08)
 
     args = parser.parse_args()
 
-    # s = (np.log(kappa**2 + 1))**.5
-    # Q_a = np.random.lognormal(mean=0,sigma=s,size=nn)
-    # Q_a=Q_a/sum(Q_a);
+
+    sigma_Q = 0.05
+    conv = make_convolve_2d_pbc(func, x, sigma_Q)
 
     Qa = correlated_random_cutoff_2d(kappa, N, 1.0 / xi, alpha=2.0,
                                            prng=prng).flatten()
+    Qa = conv(Qa)/conv(Qa).sum()
+
+
+    sigma_P = args.sigma_P
+    conv = make_convolve_2d_pbc(func, x, sigma_P)
+    fda = build_2d_frp_matrix(func, x, sigma_P)
 
     w = cross_react(Qa,fda)
 
@@ -304,7 +307,7 @@ if __name__ == "__main__":
 
 
     if args.save:
-        save_dir = './coveragecontrol/data/base'
+        save_dir = './coveragecontrol/data/base%d'%(sigma_P*100)
         if not os.path.exists(save_dir):
             os.makedirs(save_dir)
         
