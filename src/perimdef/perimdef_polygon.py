@@ -210,7 +210,7 @@ def simulate(w,e=100,na=int(100),debug=False):
         d = np.random.multinomial(na, Pd)
         d = np.repeat(np.arange(N), d)
         # random assigment
-        np.random.shuffle(d)
+        # np.random.shuffle(d)
 
         ## initialize intruders and defenders in cartesian
         intruders_init = att_xy[qa]
@@ -293,7 +293,8 @@ def simulate(w,e=100,na=int(100),debug=False):
 
         c.append(Fm(mat).mean())
         capture.append(1-fat.sum()/na)
-        # print(capture[-1], w['h'], Fm(mat).mean(), tt)
+        if args.render:
+            print(capture[-1], w['h'], Fm(mat).mean(), tt)
 
         if e > 10 and (ee % (e//10) == 0):
             print('[%04d]'%ee)
