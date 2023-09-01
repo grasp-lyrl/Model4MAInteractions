@@ -5,8 +5,8 @@ from scipy.optimize import minimize, Bounds
 import os, sys, pdb, random, datetime, pickle, argparse
 from ipdb import set_trace as st
 
-# import seaborn as sns
-# sns.set_context('talk')
+import seaborn as sns
+sns.set_context('talk')
 import matplotlib.pyplot as plt
 plt.rcParams['figure.figsize'] = [8,8]
 
@@ -17,7 +17,7 @@ plt.rc('axes', titlesize=fsz)
 plt.rc('axes', labelsize=fsz)
 plt.rc('xtick', labelsize=fsz)
 plt.rc('ytick', labelsize=fsz)
-plt.rc('legend', fontsize=fsz)
+plt.rc('legend', fontsize=0.6*fsz)
 plt.rc('figure', titlesize=fsz)
 plt.rc('pdf', fonttype=42)
 sns.set_style("ticks", rc={"axes.grid":True})
@@ -191,7 +191,7 @@ def simulate(w,e=100,na=int(100),debug=False):
     mat_list = []
     ## define perimeter
     ## we want to also map to arbitrary polygon based on arc length
-    pts = np.array([[-1,0],
+    pts = np.array([[-0.5,0],
                     [-0.5,0.5],
                     [0,1],
                     [1,1],
@@ -199,7 +199,7 @@ def simulate(w,e=100,na=int(100),debug=False):
                     [1,-1],
                     [0,-1],
                     [-0.5,-0.5],
-                    [-1,0]])
+                    [-0.5,0]])
     perim_xy, att_xy = create_perimeter(pts)
 
     for ee in range(e):
@@ -288,19 +288,25 @@ def simulate(w,e=100,na=int(100),debug=False):
                 # ax.plot(w['x'], w['pd'],label='$P_{d,u}^*$', linewidth=2.);
 
                 ## plot perimeters
-                ax1.plot(perim_xy[:,0], perim_xy[:,1], linewidth=4.0)
-                ax1.plot(att_xy[:,0], att_xy[:,1], linewidth=4.0)
+                ax1.plot(perim_xy[:,0], perim_xy[:,1], linewidth=3.0, label='perimeter')
+                ax1.plot(att_xy[:,0], att_xy[:,1], linewidth=3.0, label='att init')
 
                 ## plot agentss
-                ax1.scatter(defenders[:,0], defenders[:,1], marker='.',label='defender');
-                ax1.scatter(intruders[:,0], intruders[:,1], marker='.',label='intruder');
+                ax1.scatter(defenders[:,0], defenders[:,1], marker='o',label='defender');
+                ax1.scatter(intruders[:,0], intruders[:,1], marker='o',label='attacker');
 
+                ax1.set_xlabel('State ($x_1$)')
+                ax1.set_ylabel('State ($x_2$)')
                 plt.tight_layout()
                 plt.legend()
-                # plt.draw()
-                # plt.pause(0.001)
-                if tt == 2:
-                    plt.show()
+                plt.draw()
+                plt.pause(0.001)
+                # if tt == 1 and ee==0:
+                #     save_dir = './perimdef/data/figures'
+                #     if not os.path.exists(save_dir):
+                #         os.makedirs(save_dir)
+                #     fig.savefig(os.path.join(save_dir,'pdgame.pdf'),bbox_inches='tight')
+                    # plt.show()
 
             if fat.sum() == 0:
                 break
