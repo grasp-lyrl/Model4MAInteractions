@@ -11,7 +11,7 @@ Written by Christopher Hsu
 
 Plot and save figure
 
-base case (not used in paper)
+perimeter defense game
 """
 
 

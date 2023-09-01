@@ -5,10 +5,22 @@ from scipy.optimize import minimize, Bounds
 import os, sys, pdb, random, datetime, pickle, argparse
 from ipdb import set_trace as st
 
-import seaborn as sns
-sns.set_context('talk')
+# import seaborn as sns
+# sns.set_context('talk')
 import matplotlib.pyplot as plt
 plt.rcParams['figure.figsize'] = [8,8]
+
+sns.set_theme()
+fsz = 32
+plt.rc('font', size=fsz)
+plt.rc('axes', titlesize=fsz)
+plt.rc('axes', labelsize=fsz)
+plt.rc('xtick', labelsize=fsz)
+plt.rc('ytick', labelsize=fsz)
+plt.rc('legend', fontsize=fsz)
+plt.rc('figure', titlesize=fsz)
+plt.rc('pdf', fonttype=42)
+sns.set_style("ticks", rc={"axes.grid":True})
 
 
 """
@@ -276,8 +288,8 @@ def simulate(w,e=100,na=int(100),debug=False):
                 # ax.plot(w['x'], w['pd'],label='$P_{d,u}^*$', linewidth=2.);
 
                 ## plot perimeters
-                ax1.plot(perim_xy[:,0], perim_xy[:,1])
-                ax1.plot(att_xy[:,0], att_xy[:,1])
+                ax1.plot(perim_xy[:,0], perim_xy[:,1], linewidth=4.0)
+                ax1.plot(att_xy[:,0], att_xy[:,1], linewidth=4.0)
 
                 ## plot agentss
                 ax1.scatter(defenders[:,0], defenders[:,1], marker='.',label='defender');
@@ -285,8 +297,10 @@ def simulate(w,e=100,na=int(100),debug=False):
 
                 plt.tight_layout()
                 plt.legend()
-                plt.draw()
-                plt.pause(0.001)
+                # plt.draw()
+                # plt.pause(0.001)
+                if tt == 2:
+                    plt.show()
 
             if fat.sum() == 0:
                 break
