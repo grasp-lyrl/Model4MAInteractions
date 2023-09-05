@@ -8,6 +8,7 @@ from ipdb import set_trace as st
 import seaborn as sns
 sns.set_context('talk')
 import matplotlib.pyplot as plt
+from matplotlib import animation
 plt.rcParams['figure.figsize'] = [8,8]
 
 sns.set_theme()
@@ -181,6 +182,10 @@ def simulate(w,e=100,na=int(100),debug=False):
         fig = plt.figure()
         fig.clf()
 
+        if args.record:
+            fname = os.path.join('./perimdef/data/figures', 'eval_PerimDef_shuffle%d_control%d.mp4'%(args.shuffle,args.control))
+            moviewriter = animation.FFMpegWriter(codec='libx264')
+            moviewriter.setup(fig,outfile=fname,dpi=80)
     """
     sample na attackers from Qa. samples na def from Pd.
     record the ratio of recognized/total 
@@ -288,12 +293,12 @@ def simulate(w,e=100,na=int(100),debug=False):
                 # ax.plot(w['x'], w['pd'],label='$P_{d,u}^*$', linewidth=2.);
 
                 ## plot perimeters
-                ax1.plot(perim_xy[:,0], perim_xy[:,1], linewidth=3.0, label='perimeter')
                 ax1.plot(att_xy[:,0], att_xy[:,1], linewidth=3.0, label='att init')
+                ax1.plot(perim_xy[:,0], perim_xy[:,1], linewidth=3.0, label='perimeter')
 
                 ## plot agentss
-                ax1.scatter(defenders[:,0], defenders[:,1], marker='o',label='defender');
                 ax1.scatter(intruders[:,0], intruders[:,1], marker='o',label='attacker');
+                ax1.scatter(defenders[:,0], defenders[:,1], marker='o',label='defender');
 
                 ax1.set_xlabel('State ($x_1$)')
                 ax1.set_ylabel('State ($x_2$)')
@@ -301,6 +306,9 @@ def simulate(w,e=100,na=int(100),debug=False):
                 plt.legend()
                 plt.draw()
                 plt.pause(0.001)
+
+                if args.record:
+                    moviewriter.grab_frame()
                 # if tt == 1 and ee==0:
                 #     save_dir = './perimdef/data/figures'
                 #     if not os.path.exists(save_dir):
@@ -352,6 +360,7 @@ if __name__ == '__main__':
     parser.add_argument('--control', type=int, default=0)
     parser.add_argument('--shuffle', type=int, default=0)
     parser.add_argument('--render', type=int, default=1)
+    parser.add_argument('--record', type=int, default=0)
     args = parser.parse_args()
 
     ## sample Qa from lognormal
