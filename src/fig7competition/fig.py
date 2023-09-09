@@ -34,9 +34,9 @@ sns.set_style("ticks", rc={"axes.grid":True})
 
 fig, ax = plt.subplots(figsize=(8,8))
 
-ax.plot(w['x'],w['pd'],label='$P_d^*$', linewidth=1.5);
-ax.plot(w['x'],s['Pd'],label='$P_d$', linewidth=1.5);
-ax.plot(w['x'],s['harm'], label='Harm($P_d$)', linewidth=1.5)
+ax.plot(w['x'],w['pd'],label='$P_d^*$', linewidth=4.0);
+ax.plot(w['x'],s['Pd'],label='$P_d$', linewidth=4.0);
+# ax.plot(w['x'],s['harm'], label='Harm($P_d$)', linewidth=1.5)
 
 ax.set_xlabel('State (x)')
 ax.set_ylabel('Probability')
