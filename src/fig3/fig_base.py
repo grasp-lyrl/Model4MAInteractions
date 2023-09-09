@@ -34,7 +34,7 @@ fig, ax = plt.subplots(figsize=(8,8))
 
 ax.plot(w['x'],w['qa'],label='$Q_a$', linewidth=3.0);
 ax.plot(w['x'],w['pd'],label='$P_d^*$', linewidth=3.0);
-ax.plot(w['x'],s['harm'], label='Harm', linewidth=4.0)
+ax.plot(w['x'],s['harm'], label='$Q_a \overline{F}_a$', linewidth=4.0)
 
 ax.set_xlabel('State (x)')
 ax.set_ylabel('Probability')
