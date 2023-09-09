@@ -83,6 +83,7 @@ def run_policy(env, get_action, num_episodes=100, render=True, max_ep_len=500, s
 
             rl_h.append(np.sum(env.qhat*env.Fbar(env.conv(env.Pd))))
             Pds.append(env.Pd)
+            endPd = env.Pd
 
             o, r, d, ep_ret, ep_len = env.reset(), 0, False, 0, 0
             n += 1
@@ -98,6 +99,7 @@ def run_policy(env, get_action, num_episodes=100, render=True, max_ep_len=500, s
              Qa=env.Qa,
              Pds=Pds,
              avgPd=Pd,
+             endPd=endPd,
              Nds=Nds,
              Pdstar=Pdstar,
              opt_h=opt_h,
@@ -110,7 +112,7 @@ def run_policy(env, get_action, num_episodes=100, render=True, max_ep_len=500, s
 
     plt.plot(env.x, env.Qa, label='$Q_a$', linewidth=2.0)
     plt.plot(env.x, Pdstar, label='$P_d^*$', linewidth=2.0)
-    plt.plot(env.x, Pd, label='sac $P_d$', linewidth=3.0)
+    plt.plot(env.x, endPd, label='sac $P_d$', linewidth=3.0)
     plt.xlabel('State (x)')
     plt.ylabel('Probability')
     plt.legend()
