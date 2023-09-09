@@ -176,6 +176,13 @@ class InteractionProblem(object):
         self.t = 0.
         self.count_done = 0
 
+        ## reset KF stats
+        self.mu_belief_m = np.ones(self.na)/self.na
+        self.cov_belief = np.eye(self.na)*0.5
+        ## reset qhat beliefs
+        self.qhat = np.ones(self.N)/self.N
+        self.mu_m = self.qhat
+
         obs = self.qhat
 
         return obs
@@ -254,10 +261,60 @@ class InteractionProblem(object):
         mat is a expected number of encounters before recognition
         of size na. this dist describes the att that are most harmful
         """
-        xx = np.tile(self.mat, (self.N,1))
-        qhat = np.sum(xx*self.ii, axis=1)
-        # qhat = self.conv(qhat/qhat.sum());
-        self.qhat = qhat/qhat.sum()
+        # xx = np.tile(self.mat, (self.N,1))
+        # qhat = np.sum(xx*self.ii, axis=1)
+        # # qhat = self.conv(qhat/qhat.sum());
+        # self.qhat = qhat/qhat.sum()
+
+        """Kalman Filter: Belief update of Qa given observations
+        KF is an estimate of all na antigens
+        """
+
+        # C is an interaction of antigen, dot{m}at, a bool
+        C = np.copy(a)
+
+        var = 0.5
+        z = np.random.normal(0,var)
+        ## observation noise
+        obs_noise = np.ones(self.na)* 2 * z
+        obs_noise[C==1] = z  
+        observation = C + obs_noise
+        observation[response==1] = self.mat[response==1] +z
+        ## observation variance noise
+        Q = np.ones(self.na) * 4 * var**2
+        Q[C==1] = var**2
+
+        ## KF observation update
+        K = self.cov_belief @ C.T / (C @ self.cov_belief @ C.T + Q)
+        mu_belief = self.mu_belief_m + K*(observation - C*self.mu_belief_m)
+        self.cov_belief = (np.eye(self.na) - np.outer(K,C)) @ self.cov_belief
+
+        """We now have distributed observations of each type
+        We want combine these multiple observations to create a single estimate
+        of each type (size N) to produce a centralized KF estimate of qhat
+        """
+        ww = np.tile(mu_belief, (self.N,1))
+        # mean of Nxna matrix -> N
+        ss = np.sum(ww * self.ii, axis=1)
+        mu = np.divide(ss, self.qa1, out=np.zeros_like(ss), where=self.qa1!=0)
+        
+        """ reocover Qa_hat from state
+        original: Ma(t) = Ma(t-1)e^(nu)
+        nu = log(ma(t)/ma(t-1))
+        qhat = Ma(0) = Ma(t)e^(-nu*t)
+        """
+        nu = self.mu_m / (mu+1e-6)
+        mao = mu*nu**self.t
+
+        ## in case ma(0) is negative
+        mao = np.maximum(mao, np.zeros(self.N))
+        self.qhat = mao/mao.sum()
+        self.qhat[np.isnan(self.qhat)] = 1/self.N
+        self.qhat = self.qhat/self.qhat.sum()
+
+        ## update prev mu with mu
+        self.mu_m = mu
+        self.mu_belief_m = mu_belief
 
         rew = -a.mean()     
 
