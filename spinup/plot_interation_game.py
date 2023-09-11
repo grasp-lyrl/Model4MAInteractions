@@ -22,7 +22,7 @@ def plot_data(data, xaxis='Epoch', value="AverageEpRet", condition="Condition1",
     plt.rc('axes', labelsize=fsz)
     plt.rc('xtick', labelsize=fsz)
     plt.rc('ytick', labelsize=fsz)
-    plt.rc('legend', fontsize=fsz)
+    plt.rc('legend', fontsize=0.9*fsz)
     plt.rc('figure', titlesize=fsz)
     plt.rc('pdf', fonttype=42)
     sns.set_style("ticks", rc={"axes.grid":True})
@@ -36,13 +36,14 @@ def plot_data(data, xaxis='Epoch', value="AverageEpRet", condition="Condition1",
 
     xaxis = data['Epoch']
 
-    plt.plot(xaxis, np.repeat(7.1132,len(xaxis)), label='$P_d^*$',linewidth=3.0)
-    plt.plot(xaxis, -data['AverageTestEpRet'], label='sac $P_d$',linewidth=3.0)
+    plt.plot(xaxis, np.repeat(7.1132,len(xaxis)), label='$P_d^*(Q_a)$ Analytical',linewidth=4.0)
+    plt.plot(xaxis, -data['AverageTestEpRet'], label='$P_d(\hat{Q}_a)$ Empirical',linewidth=4.0)
 
     ax.fill_between(xaxis,-data['MaxTestEpRet'],-data['MinTestEpRet'],alpha=0.3, color='sandybrown')
 
     plt.xlabel('Epoch')
     plt.ylabel('Harm')
+    plt.ylim(5,17)
     plt.legend()
     plt.tight_layout()
     sns.despine(ax=ax)   

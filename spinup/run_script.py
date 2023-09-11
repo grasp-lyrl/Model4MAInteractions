@@ -15,7 +15,7 @@ plt.rc('axes', titlesize=fsz)
 plt.rc('axes', labelsize=fsz)
 plt.rc('xtick', labelsize=fsz)
 plt.rc('ytick', labelsize=fsz)
-plt.rc('legend', fontsize=0.8*fsz)
+plt.rc('legend', fontsize=fsz)
 plt.rc('figure', titlesize=fsz)
 plt.rc('pdf', fonttype=42)
 sns.set_style("ticks", rc={"axes.grid":True})
@@ -94,6 +94,7 @@ def run_policy(env, get_action, num_episodes=100, render=True, max_ep_len=500, s
     Pd = Pd/Pd.sum()
 
     avg_rl_h = np.sum(env.Qa*env.Fbar(env.conv(Pd)))
+    end_rl_h = np.sum(env.Qa*env.Fbar(env.conv(endPd)))
 
     s = dict(x=env.x,
              Qa=env.Qa,
@@ -106,13 +107,13 @@ def run_policy(env, get_action, num_episodes=100, render=True, max_ep_len=500, s
              avg_rl_h=avg_rl_h,
             )
 
-    print('opt harm', opt_h, 'sac harm', avg_rl_h)
+    print('opt harm', opt_h, 'avg PD sac harm', avg_rl_h, 'one sac harm', end_rl_h)
 
     fig, ax = plt.subplots(figsize=(8,8))
 
-    plt.plot(env.x, env.Qa, label='$Q_a$', linewidth=2.0)
-    plt.plot(env.x, Pdstar, label='$P_d^*$', linewidth=2.0)
-    plt.plot(env.x, endPd, label='sac $P_d$', linewidth=3.0)
+    # plt.plot(env.x, env.Qa, label='$Q_a$', linewidth=2.0)
+    plt.plot(env.x, Pdstar, label='$P_d^*(Q_a)$', linewidth=4.0)
+    plt.plot(env.x, endPd, label='$P_d(\hat{Q}_a)$', linewidth=4.0)
     plt.xlabel('State (x)')
     plt.ylabel('Probability')
     plt.legend()
@@ -145,7 +146,7 @@ if __name__ == '__main__':
     parser.add_argument('--seed', '-s', type=int, default=0)
     parser.add_argument('--cpu', type=int, default=2)
     parser.add_argument('--steps', type=int, default=10000)
-    parser.add_argument('--epochs', type=int, default=50)
+    parser.add_argument('--epochs', type=int, default=100)
     parser.add_argument('--exp_name', type=str, default='sac')
     parser.add_argument('--log_dir', type=str, default='./results')
     parser.add_argument('--save_name', type=str, default='data')
