@@ -40,7 +40,7 @@ sns.set_style("ticks", rc={"axes.grid":True})
 N = w8['N']
 nn = int(np.sqrt(N))
 
-cmap = sns.color_palette("rocket_r", as_cmap=True)
+cmap = sns.color_palette("viridis", as_cmap=True)
 
 fig, ax = plt.subplots(figsize=(8,8))
 im = ax.imshow(w8['qa'].reshape(nn,nn),vmin=0.0,vmax=0.02,label='$Q_a$',cmap=cmap)
@@ -50,9 +50,34 @@ cbar = plt.colorbar(im)
 cbar.ax.set_ylabel('Probability')
 
 
+cmap = sns.color_palette("rocket_r", as_cmap=True)
+
+import random
+def setup(seed):
+    np.random.seed(seed)
+    random.seed(seed)
+setup(42)
+
 fig1, ax1 = plt.subplots(figsize=(8,8))
 
+N_d = 10
+# init = np.random.randint(0,nn,(N_d,2))
+init = np.sort(np.random.randint(0,400,N_d))
+rows_i = init%nn
+cols_i = init//nn
+
+d = np.random.multinomial(N_d, w8['pd'])
+d = np.repeat(np.arange(N), d)
+rows = d%nn
+cols = d//nn
+## plot agentss
+ax1.scatter(rows, cols, marker='o',label='defender');
+ax1.scatter(rows_i, cols_i, marker='o',label='init');
+
 im1 = ax1.imshow(w8['pd'].reshape(nn,nn),vmin=0.0,vmax=0.1,label='$P_d$',cmap=cmap)
+
+for ii in range(N_d):
+    ax1.plot((rows_i[ii],rows[ii]), (cols_i[ii],cols[ii]))
 
 ax1.set_xlabel('State ($x_1$)')
 ax1.set_ylabel('State ($x_2$)')
@@ -77,5 +102,7 @@ if not os.path.exists(save_dir):
     os.makedirs(save_dir)
 
 fig.savefig(os.path.join(save_dir,'qa2d.pdf'),bbox_inches='tight')
-fig1.savefig(os.path.join(save_dir,'sig8_shape.pdf'),bbox_inches='tight')
-fig2.savefig(os.path.join(save_dir,'sig4_shape.pdf'),bbox_inches='tight')
+# fig1.savefig(os.path.join(save_dir,'control_sig8_shape.pdf'),bbox_inches='tight')
+# fig2.savefig(os.path.join(save_dir,'sig4_shape.pdf'),bbox_inches='tight')
+
+plt.show()

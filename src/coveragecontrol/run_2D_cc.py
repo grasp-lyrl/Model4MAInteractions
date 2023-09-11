@@ -152,7 +152,10 @@ def cross_react(qa,fda):
     # print('h*: %2.3f'%h)
     return dict(qa=qa,pd=pd,fda=fda,x=x,N=len(qa),h=h)
 
-def simulate(w,e=100,na=int(1000),debug=False):
+def simulate(w,e=100,na=int(10),debug=False):
+    if args.render:
+        fig = plt.figure()
+        fig.clf()
     """
     fat is the number of attackers at time t
     lat is the rate of interaction of a, each interaction at time t happens to a defenders
@@ -225,6 +228,33 @@ def simulate(w,e=100,na=int(1000),debug=False):
             fat += (fat >0)*nu_a
             lat += (lat >0)*nup_a
 
+            if args.render:
+                fig.clf()
+                ax1 = fig.add_subplot()
+                nn = int(np.sqrt(N))
+                # cmapqa = sns.color_palette("viridis", as_cmap=True)
+                cmappd = sns.color_palette("rocket_r", as_cmap=True)
+                # ax1.imshow(w['qa'].reshape(nn,nn),vmin=0.0,vmax=0.1,label='$Q_a$',cmap=cmapqa)
+                ax1.imshow(w['pd'].reshape(nn,nn),vmin=0.0,vmax=0.1,label='$P_d$',cmap=cmappd)
+
+                
+                rows = d%nn
+                cols = d//nn
+                rows_qa = qa[idx]%nn
+                cols_qa = qa[idx]//nn
+                ## plot agentss
+                ax1.scatter(rows_qa, cols_qa, marker='o',label='attacker');
+                ax1.scatter(rows, cols, marker='o',label='defender');
+
+                ax1.set_xlabel('State ($x_1$)')
+                ax1.set_ylabel('State ($x_2$)')
+                plt.tight_layout()
+                plt.legend()
+                plt.draw()
+                plt.pause(0.001)
+
+
+
             ## sim ending condition
             if ((fat>0).sum() == 0) or t == T-1:
                 if debug:
@@ -257,6 +287,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument('--save', type=int, default=1)
     parser.add_argument('--sigma_P', type=float, default=0.08)
+    parser.add_argument('--render', type=int, default=1)
 
     args = parser.parse_args()
 
