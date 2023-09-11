@@ -183,7 +183,7 @@ def simulate(w,e=100,na=int(100),debug=False):
         fig.clf()
 
         if args.record:
-            fname = os.path.join('./perimdef/data/figures', 'eval_PerimDef_shuffle%d_control%d.mp4'%(args.shuffle,args.control))
+            fname = os.path.join('./perimdef/data/figures', 'PerimDef_shuffle%d_control%d.mp4'%(args.shuffle,args.control))
             moviewriter = animation.FFMpegWriter(codec='libx264')
             moviewriter.setup(fig,outfile=fname,dpi=80)
     """
@@ -264,7 +264,7 @@ def simulate(w,e=100,na=int(100),debug=False):
             else:
                 control = 0
             d[idx] += control
-            defenders = perim_xy[d[idx]]
+            defenders = perim_xy[d]
 
             ## position capture
             ## recognition if def is within eps dist from att
@@ -297,13 +297,13 @@ def simulate(w,e=100,na=int(100),debug=False):
                 ax1.plot(perim_xy[:,0], perim_xy[:,1], linewidth=3.0, label='perimeter')
 
                 ## plot agentss
-                ax1.scatter(intruders[:,0], intruders[:,1], marker='o',label='attacker');
-                ax1.scatter(defenders[:,0], defenders[:,1], marker='o',label='defender');
+                ax1.scatter(intruders[:,0], intruders[:,1], marker='o', s=100, label='attacker');
+                ax1.scatter(defenders[:,0], defenders[:,1], marker='o', s=100, label='defender');
 
                 ax1.set_xlabel('State ($x_1$)')
                 ax1.set_ylabel('State ($x_2$)')
                 plt.tight_layout()
-                plt.legend()
+                plt.legend(loc=2)
                 plt.draw()
                 plt.pause(0.001)
 
@@ -341,6 +341,7 @@ def simulate(w,e=100,na=int(100),debug=False):
     # mm = conv(mm)/conv(mm).sum()
 
     print(np.mean(c), np.std(c))
+    print(np.mean(capture), np.std(capture))
 
     return dict(Qa=w['qa'],
                 Pd=Pd,
@@ -386,7 +387,7 @@ if __name__ == '__main__':
 
 
     if args.save:
-        save_dir = './data/shuffle%d_control%d'%(args.shuffle,args.control)
+        save_dir = './perimdef/data/shuffle%d_control%d'%(args.shuffle,args.control)
         if not os.path.exists(save_dir):
             os.makedirs(save_dir)
         
