@@ -165,7 +165,7 @@ def simulate(w,e=100,na=int(1000),debug=False):
             print('pd', w['pd'])
         fat = np.ones(len(qa)); lat = np.ones(len(qa)); mat = np.zeros(len(qa))
 
-        dt = 1e6/T
+        dt = 1e4/T
 
         for t in range(T):
 
@@ -213,53 +213,60 @@ def simulate(w,e=100,na=int(1000),debug=False):
             fat += (fat >0)*nu_a
             lat += (lat >0)*nup_a
 
-            """Kalman Filter: Belief update of Qa given observations
-            KF is an estimate of all na antigens
-            """
+            if not args.KF:
+                xx = np.tile(mat, (N,1))
+                qhat = np.sum(xx*ii, axis=1)
+                qhat = qhat/qhat.sum()
 
-            ## C is an interaction of antigen, dot{m}at, a bool
-            C = np.copy(a)
+            else:
 
-            var = 0.5
-            z = np.random.normal(0,var)
-            ## observation noise
-            obs_noise = np.ones(na)* 2 * z
-            obs_noise[C==1] = z  
-            observation = C + obs_noise
-            observation[response==1] = mat[response==1] +z
-            ## observation variance noise
-            Q = np.ones(na) * 4 * var**2
-            Q[C==1] = var**2
+                """Kalman Filter: Belief update of Qa given observations
+                KF is an estimate of all na antigens
+                """
 
-            ## KF observation update
-            K = cov_belief @ C.T / (C @ cov_belief @ C.T + Q)
-            mu_belief = mu_belief_m + K*(observation - C*mu_belief_m)
-            cov_belief = (np.eye(na) - np.outer(K,C)) @ cov_belief
+                ## C is an interaction of antigen, dot{m}at, a bool
+                C = np.copy(a)
 
-            """We now have distributed observations of each type
-            We want combine these multiple observations to create a single estimate
-            of each type (size N) to produce a centralized KF estimate of qhat
-            """
-            ww = np.tile(mu_belief, (N,1))
-            # mean of Nxna matrix -> N
-            ss = np.sum(ww * ii, axis=1)
-            mu = np.divide(ss, qa1, out=np.zeros_like(ss), where=qa1!=0)
-            
-            """ reocover Qa_hat from state
-            original: Ma(t) = Ma(t-1)e^(nu)
-            nu = log(ma(t)/ma(t-1))
-            qhat = Ma(0) = Ma(t)e^(-nu*t)
-            """
-            nu = mu_m / (mu+1e-6)
-            mao = mu*nu**t
+                var = 0.5
+                z = np.random.normal(0,var)
+                ## observation noise
+                obs_noise = np.ones(na)* 2 * z
+                obs_noise[C==1] = z  
+                observation = C + obs_noise
+                observation[response==1] = mat[response==1] +z
+                ## observation variance noise
+                Q = np.ones(na) * 4 * var**2
+                Q[C==1] = var**2
 
-            ## in case ma(0) is negative
-            mao = np.maximum(mao, np.zeros(N))
-            qhat = mao/mao.sum()
+                ## KF observation update
+                K = cov_belief @ C.T / (C @ cov_belief @ C.T + Q)
+                mu_belief = mu_belief_m + K*(observation - C*mu_belief_m)
+                cov_belief = (np.eye(na) - np.outer(K,C)) @ cov_belief
 
-            ## update prev mu with mu
-            mu_m = mu
-            mu_belief_m = mu_belief
+                """We now have distributed observations of each type
+                We want combine these multiple observations to create a single estimate
+                of each type (size N) to produce a centralized KF estimate of qhat
+                """
+                ww = np.tile(mu_belief, (N,1))
+                # mean of Nxna matrix -> N
+                ss = np.sum(ww * ii, axis=1)
+                mu = np.divide(ss, qa1, out=np.zeros_like(ss), where=qa1!=0)
+                
+                """ reocover Qa_hat from state
+                original: Ma(t) = Ma(t-1)e^(nu)
+                nu = log(ma(t)/ma(t-1))
+                qhat = Ma(0) = Ma(t)e^(-nu*t)
+                """
+                nu = mu_m / (mu+1e-6)
+                mao = mu*nu**t
+
+                ## in case ma(0) is negative
+                mao = np.maximum(mao, np.zeros(N))
+                qhat = mao/mao.sum()
+
+                ## update prev mu with mu
+                mu_m = mu
+                mu_belief_m = mu_belief
 
             ## sim ending condition
             if ((fat>0).sum() == 0) or t == T-1:
@@ -307,6 +314,7 @@ if __name__ == '__main__':
 
     parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument('--save', type=int, default=1)
+    parser.add_argument('--KF', type=int, default=0)
 
     args = parser.parse_args()
 
@@ -332,7 +340,7 @@ if __name__ == '__main__':
     plt.tight_layout()
 
     if args.save:
-        save_dir = './fig7/data/est_state'
+        save_dir = './fig7competition/data/est_state'
         if not os.path.exists(save_dir):
             os.makedirs(save_dir)
         

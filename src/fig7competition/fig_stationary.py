@@ -13,7 +13,7 @@ Plot and save figure 7 (used in paper)
 """
 
 
-src_dir = './fig7/data/est_state'
+src_dir = './fig7competition/data/est_state'
 s = pickle.load(open(os.path.join(src_dir, 'sim.pkl'),'rb'))
 w = pickle.load(open(os.path.join(src_dir, 'w_react.pkl'),'rb'))
 
@@ -65,8 +65,8 @@ for ii in range(len(s['qhats'])):
 
 fig1, ax1 = plt.subplots(figsize=(8,8))
 
-ax1.plot(wass_qa,label='$W_1$($Q_a$, $\hat{Q}_a$)', linewidth=3.0);
-ax1.plot(s['wass'],label='$W_1$($P_d^*$, $P_d$)', linewidth=3.0);
+ax1.plot(wass_qa,label='$W_1$($Q_a$, $\hat{Q}_a$)', linewidth=2.0);
+ax1.plot(s['wass'],label='$W_1$($P_d^*$, $P_d$)', linewidth=2.0);
 
 ax1.set_xlabel('Episodes')
 ax1.set_ylabel('$W_1$ Metric')
@@ -96,7 +96,7 @@ plt.tight_layout()
 sns.despine(ax=ax)
 
 
-save_dir = './fig7/figures'
+save_dir = './fig7competition/figures'
 if not os.path.exists(save_dir):
     os.makedirs(save_dir)
 
