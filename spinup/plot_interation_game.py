@@ -37,7 +37,7 @@ def plot_data(data, xaxis='Epoch', value="AverageEpRet", condition="Condition1",
     xaxis = data['Epoch']
 
     plt.plot(xaxis, np.repeat(7.1132,len(xaxis)), label='$P_d^*(Q_a)$ Analytical',linewidth=4.0)
-    plt.plot(xaxis, -data['AverageTestEpRet'], label='$P_d(\hat{Q}_a)$ Empirical',linewidth=4.0)
+    plt.plot(xaxis, -data['AverageTestEpRet'], label='$P_d(\hat{Q}_a, t)$ Empirical',linewidth=4.0)
 
     ax.fill_between(xaxis,-data['MaxTestEpRet'],-data['MinTestEpRet'],alpha=0.3, color='sandybrown')
 

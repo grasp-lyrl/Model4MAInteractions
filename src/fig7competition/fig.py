@@ -1,9 +1,10 @@
 import numpy as np
 import os, sys, ipdb, datetime, click, pickle #tqdm
-
+from ipdb import set_trace as st
 import seaborn as sns
 sns.set_context('talk')
 import matplotlib.pyplot as plt
+import pandas
 
 
 """
@@ -56,20 +57,36 @@ plt.tight_layout()
 sns.despine(ax=ax)
 
 
+# fig3, ax = plt.subplots(figsize=(8,8))
+# x = np.arange(len(s['c']))
+# ax.plot(x, np.repeat(w['h'],len(s['c'])),label='$P_d^*(Q_a)$ Analytical');
+# ax.plot(x, s['c'],label='$P_d(\hat{Q}_a,t)$ Empirical');
+# plt.tight_layout()
+# sns.despine(ax=ax)
+
+# ##empirical variance plotting
+# costs = s['c']
+# stdev = s['C'][1]
+# for ii in range(len(x)):
+#     minerror = max(costs[ii]-stdev, 0)
+#     ax.plot([x[ii], x[ii]], [costs[ii]+stdev, minerror], marker="_", color='sandybrown',alpha=0.3)
+
+plt.rc('legend', fontsize=0.8*fsz)
+
+cost = np.asarray(s['c']).reshape(4,25)
+data = {'25':cost[0,:],'50':cost[1,:],'75':cost[2,:],'100':cost[3,:]}
+df = pandas.DataFrame(data=data)
+
 fig3, ax = plt.subplots(figsize=(8,8))
-x = np.arange(len(s['c']))
-ax.plot(x, np.repeat(w['h'],len(s['c'])),label='$P_d^*(Q_a)$ Analytical');
-ax.plot(x, s['c'],label='$P_d(\hat{Q}_a,t)$ Empirical');
+x = np.arange(4)
+ax.plot(x, np.repeat(w['h'],4),label='$P_d^*(Q_a)$ Analytical', linewidth=5);
+sns.boxplot(df, color='sandybrown')
+
+ax.set_xlabel('Episodes')
+ax.set_ylabel('Harm')
+plt.legend()
 plt.tight_layout()
 sns.despine(ax=ax)
-
-##empirical variance plotting
-costs = s['c']
-stdev = s['C'][1]
-for ii in range(len(x)):
-    minerror = max(costs[ii]-stdev, 0)
-    ax.plot([x[ii], x[ii]], [costs[ii]+stdev, minerror], marker="_", color='sandybrown',alpha=0.3)
-
 
 
 save_dir = './fig7competition/figures'

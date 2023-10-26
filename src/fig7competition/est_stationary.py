@@ -149,8 +149,10 @@ def simulate(w,e=100,na=int(1000),debug=False):
     qhat = np.ones(N)/N
     mu_m = qhat
 
-    T=N*10
+
+    T=100
     for ee in range(e):
+        total = 0
         ## sample na attackers from Qa
         qa1 = np.random.multinomial(na, w['qa'])
         qa = np.repeat(np.arange(N), qa1)
@@ -165,7 +167,7 @@ def simulate(w,e=100,na=int(1000),debug=False):
             print('pd', w['pd'])
         fat = np.ones(len(qa)); lat = np.ones(len(qa)); mat = np.zeros(len(qa))
 
-        dt = 1e4/T
+        dt = 1e4/50
 
         for t in range(T):
 

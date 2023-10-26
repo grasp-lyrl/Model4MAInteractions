@@ -65,6 +65,7 @@ def run_policy(env, get_action, num_episodes=100, render=True, max_ep_len=500, s
     Pds = []
     qhats = []
     rl_h = []
+    c = []
     while n < num_episodes:
         ## problem runs until done then n+=1
 
@@ -81,6 +82,7 @@ def run_policy(env, get_action, num_episodes=100, render=True, max_ep_len=500, s
         if d or (ep_len == max_ep_len):
             logger.store(EpRet=ep_ret, EpLen=ep_len)
 
+            c.append(env.c)
             rl_h.append(np.sum(env.qhat*env.Fbar(env.conv(env.Pd))))
             Pds.append(env.Pd)
             endPd = env.Pd
@@ -105,9 +107,13 @@ def run_policy(env, get_action, num_episodes=100, render=True, max_ep_len=500, s
              Pdstar=Pdstar,
              opt_h=opt_h,
              avg_rl_h=avg_rl_h,
+             c=c,
+             C=(np.mean(c),np.std(c))
             )
 
     print('opt harm', opt_h, 'avg PD sac harm', avg_rl_h, 'one sac harm', end_rl_h)
+    print('Empirical Harm: %2.3f +/- %2.3f, Analytical: %2.3f'%
+                                (s['C'][0], s['C'][1], end_rl_h))
 
     fig, ax = plt.subplots(figsize=(8,8))
 
