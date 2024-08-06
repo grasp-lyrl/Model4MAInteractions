@@ -156,7 +156,7 @@ if __name__ == '__main__':
     parser.add_argument('--exp_name', type=str, default='sac')
     parser.add_argument('--log_dir', type=str, default='./results')
     parser.add_argument('--save_name', type=str, default='data')
-    parser.add_argument('--fpath', type=str, default='./results/sac/sac_s0')
+    parser.add_argument('--fpath', type=str, default='./results/noKFsac100epoch/sac_s0')
     parser.add_argument('--num_test_ep', type=int, default=5)
     parser.add_argument('--test_render', type=int, default=1)
     parser.add_argument('--na', type=int, default=100)
