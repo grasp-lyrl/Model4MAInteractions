@@ -96,7 +96,7 @@ cbar.ax.set_ylabel('Probability')
 
 
 
-save_dir = './coveragecontrol/figures'
+save_dir = './results/coveragecontrol/fig2D'
 if not os.path.exists(save_dir):
     os.makedirs(save_dir)
 
