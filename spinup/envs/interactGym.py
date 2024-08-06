@@ -14,6 +14,7 @@ import gym
 from gym import spaces
 
 import matplotlib.pyplot as plt
+from matplotlib import animation
 # %matplotlib inline
 plt.rcParams['figure.figsize'] = [8,8]
 
@@ -83,6 +84,11 @@ class InteractionProblem(object):
 
         self.Pd = np.ones(self.N)/self.N
         self.Pdstar = self.Pd
+
+        self.fig = plt.figure()
+        fname = os.path.join('./results/videos', 'rl.mp4')
+        self.moviewriter = animation.FFMpegWriter(codec='libx264')
+        self.moviewriter.setup(self.fig,outfile=fname,dpi=80)
 
     def make_convolve_1d_pbc(self, B=1.0):
         frp = np.zeros_like(self.x)
@@ -274,13 +280,18 @@ class InteractionProblem(object):
         return self.qhat, rew, done, info
 
     def render(self):
-        plt.clf()
-        plt.plot(self.x, self.Qa, label='$Q_a$')
-        plt.plot(self.x, self.qhat, label='$\hat{Q}_a$')
-        plt.plot(self.x, self.Pd, label='$P_d$')
-        plt.legend()
+        self.fig.clf()
+        ax = self.fig.add_subplot()
+        # if args.record:
+
+        ax.plot(self.x, self.Qa, label='$Q_a$', linewidth=3.0)
+        ax.plot(self.x, self.Pd, label='$P_d$', linewidth=3.0)
+        # ax.plot(self.x, self.qhat, label='$\hat{Q}_a$', linewidth=2.0)
+        plt.tight_layout()
+        plt.legend(loc=2)
         plt.draw()
-        plt.pause(0.001)
+        plt.pause(0.0001)
+        self.moviewriter.grab_frame()
 
 def normalize(sample):
     return sample/sample.sum()
